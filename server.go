@@ -8,11 +8,13 @@ import(
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"net/http"
+	"github.com/stianeikeland/go-rpio"
+	"strconv"
 )
 
 var ctx = context.Background()
 var client = redis.NewClient(&redis.Options{
-	Addr: "redis_go_rails:6379",
+	Addr: "192.168.1.64:6378",
 	Password:"vurokrazia",
 	DB: 0,
 })
@@ -49,9 +51,10 @@ func ConnectNewClient(channel_request chan DevicePort)  {
 		if err := json.Unmarshal([]byte(message.Payload), &request); err != nil {
 			fmt.Println("Imposible read json")
 		}
-		fmt.Println(request.Id)
-		fmt.Println(request.Status)
-		fmt.Println(request.Port)
+		// fmt.Println(request.Id)
+		// fmt.Println(request.Status)
+		// fmt.Println(request.Port)
+		InitLeds(request)
 		channel_request <- request
 		// fmt.Println(message)
 		// fmt.Println(message.Payload)
@@ -116,4 +119,29 @@ func SendMessage(request DevicePort)  {
 			return 
 		}
 	}
+}
+
+func InitLeds(dp DevicePort)  {
+	fmt.Println("opening gpio")
+	fmt.Println(dp.Status)
+	err := rpio.Open()
+	if err != nil {
+		panic(fmt.Sprint("unable to open gpio", err.Error()))
+	}
+
+	defer rpio.Close()
+	i, _ := strconv.ParseInt(dp.Port, 10, 32)
+	pin := rpio.Pin(i)
+	pin.Output()
+	fmt.Println(dp.Status == "1")	
+	if dp.Status == "1" {
+		pin.High() 
+	} else {
+		pin.Low() 
+	}
+	// pin.Toggle()
+	// for x := 0; x < 2; x++ {
+	// 	pin.Toggle()
+	// 	time.Sleep(time.Second / 8)
+	// }
 }
