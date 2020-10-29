@@ -13,11 +13,7 @@ import(
 )
 
 var ctx = context.Background()
-var client = redis.NewClient(&redis.Options{
-	Addr: "192.168.1.64:6378",
-	Password:"vurokrazia",
-	DB: 0,
-})
+var client *redis.Client 
 
 type Message struct {
 	Id int
@@ -68,8 +64,19 @@ func SendMessageRedis()  {
 	}
 }
 
+func GetRedis()  *redis.Client {
+		return redis.NewClient(&redis.Options{
+		Addr: GetRedisconfiguration().Addr,
+		Password: GetRedisconfiguration().Password,
+		DB: 0,
+	})
+}
+
 func main(){
+	client = GetRedis()
+
 	fmt.Println("Hello World")
+	InitEnviromentVars()
 	SendMessageRedis()
 	channel_request := make(chan DevicePort)
 	go ConnectNewClient(channel_request)
