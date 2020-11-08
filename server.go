@@ -34,8 +34,19 @@ type Client struct {
 
 var Clients = make(map[int]Client)
 
+func MotorStatus(status string ,motor_a /*, motor_b*/ rpio.Pin){
+	if status == "1" {
+		motor_a.High()
+		// motor_b.High()
+	} else {
+		motor_a.Low()
+		// motor_b.Low()
+	}
+	// time.Sleep(1 * time.Second)
+}
+
 func ConnectNewClient(channel_request chan DevicePort)  {
-	pubsub := client.PSubscribe(ctx, "device_1*")
+	pubsub := client.PSubscribe(ctx, "device_2*")
 	defer pubsub.Close()
 	for {
 		message, err := pubsub.ReceiveMessage(ctx)
@@ -140,12 +151,7 @@ func InitLeds(dp DevicePort)  {
 	i, _ := strconv.ParseInt(dp.Port, 10, 32)
 	pin := rpio.Pin(i)
 	pin.Output()
-	fmt.Println(dp.Status == "1")	
-	if dp.Status == "1" {
-		pin.High() 
-	} else {
-		pin.Low() 
-	}
+	MotorStatus(dp.Status,pin)
 	// pin.Toggle()
 	// for x := 0; x < 2; x++ {
 	// 	pin.Toggle()
