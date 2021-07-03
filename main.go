@@ -7,12 +7,12 @@ import (
 	"net/http"
 	"raspberry_go/configs"
 	"raspberry_go/entity"
-	"strconv"
+	//"strconv"
 	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
-	"github.com/stianeikeland/go-rpio"
+	//"github.com/stianeikeland/go-rpio"
 )
 
 var ctx = context.Background()
@@ -20,8 +20,9 @@ var client *redis.Client
 
 var Clients = make(map[int]entity.Client)
 
-func ConnectNewClient(channel_request chan entity.DevicePort) {
-	pubsub := client.PSubscribe(ctx, "device_port_1")
+func ConnectNewClient(port string, channel_request chan<- entity.DevicePort) {
+	fmt.Print(channel_request)
+	pubsub := client.PSubscribe(ctx, "device_port_"+port)
 	defer pubsub.Close()
 	for {
 		message, err := pubsub.ReceiveMessage(ctx)
@@ -57,7 +58,7 @@ func main() {
 	client = GetRedis()
 	SendMessageRedis()
 	channel_request := make(chan entity.DevicePort)
-	go ConnectNewClient(channel_request)
+	go ConnectNewClient("1", channel_request)
 	go ValidateChannel(channel_request)
 	mux := mux.NewRouter()
 	http.Handle("/", mux)
@@ -85,19 +86,19 @@ func SendMessage(request entity.DevicePort) {
 func InitLeds(dp entity.DevicePort) {
 	fmt.Println("opening gpio")
 	fmt.Println(dp.Status)
-	err := rpio.Open()
-	if err != nil {
-		panic(fmt.Sprint("unable to open gpio", err.Error()))
-	}
+	// err := rpio.Open()
+	// if err != nil {
+	// 	panic(fmt.Sprint("unable to open gpio", err.Error()))
+	// }
 
-	defer rpio.Close()
-	i, _ := strconv.ParseInt(dp.Port, 10, 32)
-	pin := rpio.Pin(i)
-	pin.Output()
-	fmt.Println(dp.Status == "1")
-	if dp.Status == "1" {
-		pin.High()
-	} else {
-		pin.Low()
-	}
+	// defer rpio.Close()
+	// i, _ := strconv.ParseInt(dp.Port, 10, 32)
+	// pin := rpio.Pin(i)
+	// pin.Output()
+	// fmt.Println(dp.Status == "1")
+	// if dp.Status == "1" {
+	// 	pin.High()
+	// } else {
+	// 	pin.Low()
+	// }
 }
