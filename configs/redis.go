@@ -1,4 +1,4 @@
-package main
+package configs
 
 import (
 	"github.com/eduardogpg/gonv"
@@ -14,7 +14,7 @@ var redisconfiguration *RedisConfig
 
 func init(){
 	redisconfiguration = &RedisConfig{}
-	redisconfiguration.Addr	= gonv.GetStringEnv("REDIS_ADDR", "thisjesusmartinez.com:6378")
+	redisconfiguration.Addr	= gonv.GetStringEnv("REDIS_ADDR", "localhost:6378")
 	redisconfiguration.Password	= gonv.GetStringEnv("REDIS_PASSWORD", "vurokrazia")
 	redisconfiguration.DB	= gonv.GetStringEnv("REDIS_DB", "0")
 }

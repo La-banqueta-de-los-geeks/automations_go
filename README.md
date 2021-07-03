@@ -1,1 +1,1 @@
-# vuro_automations_go
+# automations_go
