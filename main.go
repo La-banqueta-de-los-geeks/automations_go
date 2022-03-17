@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"raspberry_go/configs"
-	"raspberry_go/entity"
+	"github.com/vurokrazia/automations_go/configs"
+	"github.com/vurokrazia/automations_go/entity"
 	//"strconv"
 	"time"
 
